@@ -8,10 +8,15 @@ defmodule LiveTalkWeb.ThermostatLive do
     """
   end
 
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     # Let's assume a fixed temperature for now
     temperature = 70
-    {:ok, socket |> assign(:temperature, temperature)}
+
+    inspect(params)
+
+    {:ok,
+     socket
+     |> assign(:temperature, temperature)}
   end
 
   def handle_event("inc_temperature", _params, socket) do

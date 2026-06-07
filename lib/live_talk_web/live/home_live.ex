@@ -4,7 +4,6 @@ defmodule LiveTalkWeb.HomeLive do
   def render(assigns) do
     ~H"""
     <div class="text-8xl">
-
       We are in a div here
     </div>
     """
