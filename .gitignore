@@ -1,0 +1,19 @@
+# Dependencies and build
+/_build/
+/deps/
+
+# Generated assets
+/priv/static/assets/
+
+# Dialyzer
+/priv/plts/
+
+# Crash dumps
+erl_crash.dump
+
+# Editor/IDE
+.elixir_ls/
+.lexical/
+
+# OS
+.DS_Store
