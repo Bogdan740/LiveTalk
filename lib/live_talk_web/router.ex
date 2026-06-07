@@ -18,7 +18,7 @@ defmodule LiveTalkWeb.Router do
     pipe_through(:browser)
 
     live("/", HomeLive)
-    live("/thermostat", ThermostatLive)
+    live("/chat", ChatLive)
   end
 
   # Other scopes may use custom stacks.
@@ -39,7 +39,6 @@ defmodule LiveTalkWeb.Router do
       pipe_through(:browser)
 
       live_dashboard("/dashboard", metrics: LiveTalkWeb.Telemetry)
-      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 end

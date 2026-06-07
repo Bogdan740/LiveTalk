@@ -7,6 +7,19 @@
 # General application configuration
 import Config
 
+config :live_talk, :scopes,
+  user: [
+    default: true,
+    module: LiveTalk.Accounts.Scope,
+    assign_key: :current_scope,
+    access_path: [:user, :id],
+    schema_key: :user_id,
+    schema_type: :id,
+    schema_table: :users,
+    test_data_fixture: LiveTalk.AccountsFixtures,
+    test_setup_helper: :register_and_log_in_user
+  ]
+
 config :live_talk,
   ecto_repos: [LiveTalk.Repo],
   generators: [timestamp_type: :utc_datetime]
