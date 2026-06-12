@@ -1,11 +1,11 @@
 defmodule LiveTalkWeb.HomeLive do
   use LiveTalkWeb, :live_view
 
-  def mount(params, session, socket) do
+  def mount(_params, _session, socket) do
     {:ok, socket}
   end
 
-  def handle_event("submit-username", %{"username" => username} = assigns, socket) do
+  def handle_event("submit-username", %{"username" => username}, socket) do
     {:noreply,
      socket
      |> assign(:username, username)
