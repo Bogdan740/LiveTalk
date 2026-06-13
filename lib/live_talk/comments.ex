@@ -18,7 +18,7 @@ defmodule LiveTalk.Comments do
 
   """
   def list_comments do
-    Repo.all(Comment)
+    Repo.all(Comment |> from(limit: 50) |> order_by(asc: :inserted_at))
   end
 
   @doc """

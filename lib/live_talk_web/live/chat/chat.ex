@@ -2,11 +2,12 @@ defmodule LiveTalkWeb.ChatLive do
   use LiveTalkWeb, :live_view
   alias LiveTalk.Comments
   alias LiveTalk.Comments.Comment
+  alias Phoenix.PubSub
 
-  defp get_empty_form(username),
-    do: %Comment{} |> Comment.changeset(%{body: "", username: username}) |> to_form()
+  @topic "chat"
 
   def mount(params, _session, socket) do
+    PubSub.subscribe(LiveTalk.PubSub, @topic)
     username = Map.get(params, "username", "empty")
 
     {:ok,
@@ -19,6 +20,9 @@ defmodule LiveTalkWeb.ChatLive do
      )
      |> fetch_comments()}
   end
+
+  defp get_empty_form(username),
+    do: %Comment{} |> Comment.changeset(%{body: "", username: username}) |> to_form()
 
   defp fetch_comments(socket) do
     socket |> assign(:comments, Comments.list_comments())
@@ -38,15 +42,17 @@ defmodule LiveTalkWeb.ChatLive do
   def handle_event(
         "save",
         %{"comment" => params},
-        %{assigns: %{username: username}} = socket
+        %{assigns: %{username: username, comments: comments}} = socket
       ) do
     params_with_username = params |> Map.put_new("username", username)
 
     case Comments.create_comment(params_with_username) do
-      {:ok, _comment} ->
+      {:ok, comment} ->
+        PubSub.broadcast_from(LiveTalk.PubSub, self(), @topic, {:new_comment, comment})
+
         {:noreply,
          socket
-         |> fetch_comments()
+         |> assign(:comments, comments ++ [comment])
          |> assign(
            :form,
            get_empty_form(username)
@@ -62,14 +68,22 @@ defmodule LiveTalkWeb.ChatLive do
     {:noreply, socket |> fetch_comments()}
   end
 
+  def handle_info({:new_comment, comment}, %{assigns: %{comments: comments}} = socket) do
+    {:noreply, socket |> assign(comments: [comment] ++ comments)}
+  end
+
+  defp format_time(%DateTime{hour: hour, minute: minute, second: second}) do
+    "#{hour}:#{minute}:#{second}"
+  end
+
   def render(assigns) do
     ~H"""
     <div class="h-full">
       <h1>You are now on the chat page, your username is: {@username}</h1>
       <div class="flex flex-col h-full">
-        <div class="chat-display bg-slate-400 h-5/6 overflow-scroll"> This is where the chat display goes
+        <div class="chat-display bg-slate-400 h-4/6 overflow-scroll"> This is where the chat display goes
           <%= for comment <- @comments do %>
-              <li><span><%= comment.username %> - <%= comment.body %></span> </li>
+              <li><span> <%= format_time(comment.inserted_at) %> | <%= comment.username %> - <%= comment.body %></span> </li>
               <% end %>
         </div>
         <div class="chat-input bg-blue-700 h-1/6"> This is where we are gonna let the user do the input
