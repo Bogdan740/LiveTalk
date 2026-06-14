@@ -2,6 +2,7 @@ defmodule LiveTalkWeb.ChatLive do
   use LiveTalkWeb, :live_view
   alias LiveTalk.Comments
   alias LiveTalk.Comments.Comment
+  alias LiveTalkWeb.Components
   alias Phoenix.PubSub
 
   @topic "chat"
@@ -72,10 +73,6 @@ defmodule LiveTalkWeb.ChatLive do
     {:noreply, socket |> assign(comments: [comment] ++ comments)}
   end
 
-  defp format_time(%DateTime{hour: hour, minute: minute, second: second}) do
-    "#{hour}:#{minute}:#{second}"
-  end
-
   def render(assigns) do
     ~H"""
     <div class="h-full">
@@ -83,7 +80,9 @@ defmodule LiveTalkWeb.ChatLive do
       <div class="flex flex-col h-full">
         <div class="chat-display bg-slate-400 h-4/6 overflow-scroll"> This is where the chat display goes
           <%= for comment <- @comments do %>
-              <li><span> <%= format_time(comment.inserted_at) %> | <%= comment.username %> - <%= comment.body %></span> </li>
+              <li>
+                <Components.Comment.comment comment={comment} current_user_username={@username}/>
+              </li>
               <% end %>
         </div>
         <div class="chat-input bg-blue-700 h-1/6"> This is where we are gonna let the user do the input
