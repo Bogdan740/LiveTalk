@@ -66,6 +66,7 @@ defmodule LiveTalkWeb.ChatLive do
 
   def handle_event("delete-all", _params, socket) do
     Comments.delete_all_comments()
+    PubSub.broadcast_from(LiveTalk.PubSub, self(), @topic, :all_messages_deleted)
     {:noreply, socket |> fetch_comments()}
   end
 
@@ -73,12 +74,15 @@ defmodule LiveTalkWeb.ChatLive do
     {:noreply, socket |> assign(comments: comments ++ [comment])}
   end
 
+  def handle_info(:all_messages_deleted, socket) do
+    {:noreply, socket |> assign(comments: [])}
+  end
+
   def render(assigns) do
     ~H"""
     <div class="h-full">
-      <h1>You are now on the chat page, your username is: {@username}</h1>
       <div class="flex flex-col h-full">
-        <div class="chat-display bg-slate-400 h-4/6 overflow-scroll"> This is where the chat display goes
+        <div class="chat-display bg-slate-400 h-4/6 overflow-scroll">
           <%= for comment <- @comments do %>
               <li>
                 <Components.Comment.comment comment={comment} current_user_username={@username}/>
