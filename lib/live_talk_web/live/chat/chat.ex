@@ -70,7 +70,7 @@ defmodule LiveTalkWeb.ChatLive do
   end
 
   def handle_info({:new_comment, comment}, %{assigns: %{comments: comments}} = socket) do
-    {:noreply, socket |> assign(comments: [comment] ++ comments)}
+    {:noreply, socket |> assign(comments: comments ++ [comment])}
   end
 
   def render(assigns) do
